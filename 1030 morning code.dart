@@ -9,12 +9,14 @@ List<int> zeroMove(List<int> nums) {
     return nums; //정수 배열의 길이가 1일때 
   } else {
     //var placeZero = nums.where((numbers) => numbers == 0);
+    int zeroLength = 0;
     for (int i = 0; i < nums.length; i++){
       if (nums[i] == 0){
         nums.remove(i);
-        nums.add(0);
+        //nums.add(0);
+        zeroLength += 1;
       }
-    //nums.addAll(Iterable<int>.generate(placeZero.length).toList());
+    nums.addAll(Iterable<int>.generate(zeroLength).toList());
     }
   return nums;
   }
@@ -41,7 +43,7 @@ bool partialChecker(List<String> shorter, List<String> longer){
   int tracker = 0;
   for (int i = 0; i<shorter.length; i++){
     if (tracker != 0){
-      
+
     }
     if (longer.firstWhere((element) => element == shorter[i])){
       tracker = i;
