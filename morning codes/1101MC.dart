@@ -3,6 +3,7 @@ class Solution {
     List<int> answer = [];
     for (int i = 0; i<nums.length; i++){
         List<int> element = List.from(nums);
+        // ignore: unused_local_variable
         int reduction = element.removeAt(i);
         answer.add(element.reduce((a,b) => a*b));
     }
