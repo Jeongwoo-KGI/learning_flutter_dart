@@ -49,7 +49,12 @@ Character loadCharacterStats(){
 }
 
 Monster loadMonsterStats(){
-  loadStats('monsters.txt');
+//call 3 monsters
+  for(int i; i<3; i++){
+    //
+    print(loadStats('monsters.txt'));
+  }
+  
 
 
 }
@@ -59,6 +64,7 @@ class Character {
   int health;
   int attack;
   int defense;
+  bool alive = true;
   
   //생성자
   Character(this.name, this.health, this.attack, this.defense);
@@ -67,8 +73,14 @@ class Character {
     return this.attack;
   }
 
-  void defenseAction(int attacked) {
+  bool defenseAction(int attacked) {
     this.health -= attacked - this.defense;
+    if (this.health <= 0){
+      print('사망하셨습니다. 게임을 다시 도전해주세요');
+      return this.alive = false;
+    } else {
+      return this.alive;
+    }
   }
 }
 
@@ -77,6 +89,7 @@ class Monster extends Character {
   int health;
   int defense = 0;
   int attack;
+  bool alive = true;
 
   //생성자
   Monster(this.name, this.health, this.attack) : super('', 0, 0, 0);
@@ -86,6 +99,19 @@ class Monster extends Character {
     //randomizing the output 0<=value<=attack
     return Random(42).nextInt(attack +1);
   }
+  //attacked
+  void getattacked(int attacked) {
+    this.health -= attacked;
+    checkDeath();
+    if (this.alive == false){
+      print('적을 처치하셨습니다!');
+    }
+  }
+  //check if dead
+  void checkDeath() {
+    if (health <=0){this.alive = false;}
+  }
+
 }
 
 String? getCharacterName(){
@@ -103,7 +129,80 @@ void main() {
   if (stdin.readLineSync() == 'y'){
     print('용사님, 당신의 이름은 무엇입니까?');
     Character user = loadCharacterStats();
+    print('$user님, 이세계 생활을 응원합니다');
+    print('당신의 현재 스테이터스입니다. 체력 : ${user.health}, 공격력 : ${user.attack}, 방어력 : ${user.defense}');
+    print('공격력 만큼 상대방의 체력을 깎을 수 있고 깎고, 공격을 받을때 방어력 만큼 체력이 덜 깎이는 시스템입니다.');
+    print('이세게에 익숙하지 않은 당신, 튜토리얼로 겸 적응 겸 해서 저 히어로에게 선빵을 날릴 수 있게 해드릴게요 :) ');
 
+    bool close = false;  
+    while(close == false){
+      int choiceAction = inputAction(user);
+      try {
+        Monster apponent = loadMonsterStats();
+        switch (choiceAction){
+          //힐
+          case 0:
+            user.health += 5;
+            actions(user, apponent);
+            choiceAction = inputAction(user);
+          //공격
+          case 1:
+            apponent.getattacked(user.attack);
+            print('상대방의 남은 체력은 ${apponent.health}입니다.');
+            actions(user, apponent);
+            choiceAction = inputAction(user);
+          //방어
+          case 2: 
+            print('방어를 선택하셨군요! 공격할 힘까지 보태서 방어에 전념하는 모습, 당신은 금강불괴입니다.');
+            user.defense += user.attack;
+            actions(user,apponent);
+            user.defense -= user.attack;
+            choiceAction = inputAction(user);
+          //저장 및 종료
+          case 3:
+            print('현재 상황을 저장하고 종료하겠습니다.');
+            //ToDo: save changes in CSV
+            shutDown();
+
+        }
+      } catch (e){
+        print(e);
+        print('오류에 따라 시스템을 강제종료합니다.');
+        close = true;
+        shutDown();
+      }
+
+    }
+    if (close == true){
+      shutDown();
+    }
+
+  } else {
+    shutDown();
   }
 
 }
+
+//shutdown function
+void shutDown() {
+  print('다음에 봐요. 게임은 여기서 종료하겠습니다.');
+}
+
+//user interactions to iterate over
+int inputAction(Character user) {
+  print('your turn, ${user.name}');
+  print('chose your action');
+  print('0: heal(+5 health), 1: attack, 2: guard(attack point added to defense), 3: save and close');
+  int action = int.parse(stdin.readLineSync()!);
+  return action;
+}
+
+//actions to iterate over
+void actions(Character user, Monster apponent){
+  print('상대방의 공격이 들어옵니다!');
+  bool life = user.defenseAction(apponent.attackAction());
+  if (life == true) {print('당신의 남은 체력은 ${user.health}입니다.');}
+  else {shutDown();}
+}
+
+//toDo: make function for reading monsters and pulling up one after another
