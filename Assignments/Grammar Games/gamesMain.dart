@@ -151,9 +151,9 @@ void main() {
         switch (choiceAction){
           //힐
           case 0:
-            var chance = Raondom.nextDouble();
-            if (chance <= 0.7) {print('failed to heal');}
-            else {user.health += 10;}
+            var chance = Random().nextInt(10);
+            if (chance <= 7) {print('failed to heal');}
+            else {user.health += 10; print('successfully healed');}
             actions(user, apponent);
             //choiceAction = inputAction(user);
           //공격
