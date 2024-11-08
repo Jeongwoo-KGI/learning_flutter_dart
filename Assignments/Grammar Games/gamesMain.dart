@@ -1,58 +1,54 @@
-import 'dart:async';
+//import 'dart:async';
 import 'dart:io';
-import 'dart:convert';
+//import 'dart:convert';
 import 'dart:math';
 
 
-Future<Character> loadStats(String filename) async{
-  if (filename.contains('char')){
-    try {
-      final file = File(filename);
-      final contents = await file.readAsStringSync();
-      final stats = contents.split(',');
-      if (stats.length != 3) throw FormatException('Invalid character data');
+Character loadStats(String filename) {
+  try {
+    final file = File(filename);
+    final contents = file.readAsStringSync();
+    final stats = contents.split(',');
+    if (stats.length != 3) throw FormatException('Invalid character data');
         
-      int health = int.parse(stats[0]);
-      int attack = int.parse(stats[1]);
-      int defense = int.parse(stats[2]);
+    int health = int.parse(stats[0]);
+    int attack = int.parse(stats[1]);
+    int defense = int.parse(stats[2]);
         
-      String? name = getCharacterName();
-      Character character = Character(name, health, attack, defense);
-      return character;
-    } catch (e) {
-      print('캐릭터 데이터를 불러오는 데 실패했습니다: $e');
-      exit(1);  
-    }
-  } else {
-      try {
-      final file = File(filename);
-      final contents = await file.readAsStringSync();
-      final stats = contents.split(',');
-      if (stats.length != 3) throw FormatException('Invalid character data');
-        
-      String name  = stats[0];
-      int health = int.parse(stats[1]);
-      int attack = int.parse(stats[2]);
-        
-      Monster monster = Monster (name, health, attack);
-      return monster;
-    } catch (e) {
-      print('몬스터 데이터를 불러오는 데 실패했습니다: $e');
-      exit(1);  
-    }
+    String? name = getCharacterName();
+    Character character = Character(name, health, attack, defense);
+    return character;
+  } catch (e) {
+    print('캐릭터 데이터를 불러오는 데 실패했습니다: $e');
+    exit(1);  
   }
-
+}
+Monster loadMStats(String filename){
+  try {
+    final file = File(filename);
+    final contents = file.readAsStringSync();
+    final stats = contents.split(',');
+    if (stats.length != 3) throw FormatException('Invalid character data');    
+    String name  = stats[0];
+    int health = int.parse(stats[1]);
+    int attack = int.parse(stats[2]);    
+    Monster monster = Monster (name, health, attack);
+    return monster;
+  } catch (e) {
+    print('몬스터 데이터를 불러오는 데 실패했습니다: $e');
+    exit(1);  
+  }
 }
 
 Character loadCharacterStats(){
-  return loadStats('characters.txt');
+  return loadStats('C:\\Users\\green\\SPARTA2024\\learning_flutter_dart\\Assignments\\Grammar Games\\characters.txt');
 }
 
 Monster loadMonsterStats(){
 //call 3 monsters
   //for(int i; i<3; i++){
     //
-return(loadStats('monsters.txt'));
+return loadMStats('C:\\Users\\green\\SPARTA2024\\learning_flutter_dart\\Assignments\\Grammar Games\\monsters.txt');
 }
   
 
@@ -121,7 +117,7 @@ void main() {
   print('당신은 이세계 트럭에 의해 이곳으로 넘어온 용사입니다.');
   print('저기 히어로들이 당신을 쫓아오고 짜증나게 하는데 한번 혼쭐부터 내줄까요?');
 
-  print('게임을 시작하시겠습니까? (y/n)');
+  print('게임을 시작하시겠습니까? (y)');
 
   if (stdin.readLineSync() == 'y'){
     print('용사님, 당신의 이름은 무엇입니까?');
@@ -136,34 +132,36 @@ void main() {
       int choiceAction = inputAction(user);
       try {
         Monster apponent = loadMonsterStats();
+        print('상대방의 체력은 ${apponent.health}, 공격력은 ${apponent.attack}, 방어력은 ${apponent.defense}인 ${apponent.name}입니다!');
         switch (choiceAction){
           //힐
           case 0:
             user.health += 5;
             actions(user, apponent);
-            choiceAction = inputAction(user);
+            //choiceAction = inputAction(user);
           //공격
           case 1:
             apponent.getattacked(user.attack);
             print('상대방의 남은 체력은 ${apponent.health}입니다.');
             actions(user, apponent);
-            choiceAction = inputAction(user);
+            //choiceAction = inputAction(user);
           //방어
           case 2: 
             print('방어를 선택하셨군요! 공격할 힘까지 보태서 방어에 전념하는 모습, 당신은 금강불괴입니다.');
             user.defense += user.attack;
             actions(user,apponent);
             user.defense -= user.attack;
-            choiceAction = inputAction(user);
+            //choiceAction = inputAction(user);
           //저장 및 종료
           case 3:
             print('현재 상황을 저장하고 종료하겠습니다.');
             //ToDo: save changes in CSV
-            shutDown();
+            //shutDown();
+            close = true;
 
           default: 
             print('잘못된 입력입니다. 다시 입력해주세요');
-            choiceAction = inputAction(user);
+            //choiceAction = inputAction(user);
 
 
         }
@@ -172,15 +170,18 @@ void main() {
         print('오류에 따라 시스템을 강제종료합니다.');
         close = true;
         shutDown();
+        break;
       }
 
     }
     if (close == true){
       shutDown();
+      //break;
     }
 
   } else {
     shutDown();
+
   }
 
 }
@@ -196,6 +197,7 @@ int inputAction(Character user) {
   print('chose your action');
   print('0: heal(+5 health), 1: attack, 2: guard(attack point added to defense), 3: save and close');
   int action = int.parse(stdin.readLineSync()!);
+  print('$action을 입력하셨습니다.');
   return action;
 }
 
