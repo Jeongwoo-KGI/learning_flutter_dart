@@ -45,19 +45,16 @@ Future<Character> loadStats(String filename) async{
 }
 
 Character loadCharacterStats(){
-  loadStats('characters.txt');
+  return loadStats('characters.txt');
 }
 
 Monster loadMonsterStats(){
 //call 3 monsters
-  for(int i; i<3; i++){
+  //for(int i; i<3; i++){
     //
-    print(loadStats('monsters.txt'));
-  }
-  
-
-
+return(loadStats('monsters.txt'));
 }
+  
 
 class Character {
   String? name;
@@ -163,6 +160,11 @@ void main() {
             print('현재 상황을 저장하고 종료하겠습니다.');
             //ToDo: save changes in CSV
             shutDown();
+
+          default: 
+            print('잘못된 입력입니다. 다시 입력해주세요');
+            choiceAction = inputAction(user);
+
 
         }
       } catch (e){
