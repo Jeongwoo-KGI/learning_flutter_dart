@@ -49,7 +49,7 @@ class Monster extends Character {
   }
   //attacked
   void getattacked(int attacked) {
-    this.health -= attacked;
+    this.health -= attacked - this.defense;
     checkDeath();
     if (this.alive == false){
       print('적을 처치하셨습니다!');
