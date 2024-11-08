@@ -116,9 +116,9 @@ class Monster extends Character {
   }
 }
 
-String? getCharacterName(){
+String getCharacterName(){
   print('캐릭터 이름을 정해주세요 (한글은 깨져요 ㅠㅠ)');
-  return stdin.readLineSync();
+  return stdin.readLineSync()!;
 }
 
 void main() {
@@ -151,7 +151,9 @@ void main() {
         switch (choiceAction){
           //힐
           case 0:
-            user.health += 5;
+            var chance = Raondom.nextDouble();
+            if (chance <= 0.7) {print('failed to heal');}
+            else {user.health += 10;}
             actions(user, apponent);
             //choiceAction = inputAction(user);
           //공격
@@ -185,6 +187,7 @@ void main() {
               }
             } catch (e) {
               print(e);
+              print('returning to previous choice');
             }
 
           //저장 및 종료
@@ -230,7 +233,7 @@ void shutDown() {
 int inputAction(Character user) {
   print('your turn, ${user.name}');
   print('chose your action');
-  print('0: heal(+5 health), 1: attack, 2: guard(attack point added to defense), 3: use items, 4: save and close');
+  print('0: heal(+10 health) by 30% chance, 1: attack, 2: guard(attack point added to defense), 3: use items, 4: save and close');
   int action = int.parse(stdin.readLineSync()!);
   print('$action을 입력하셨습니다.');
   return action;
