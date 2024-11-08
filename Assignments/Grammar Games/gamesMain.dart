@@ -75,6 +75,12 @@ class Character {
       return this.alive;
     }
   }
+  void incrementDefense() {
+    this.defense += 1;
+  }
+  void incrementAttack() {
+    this.attack += 1;
+  }
 }
 
 class Monster extends Character {
@@ -104,7 +110,10 @@ class Monster extends Character {
   void checkDeath() {
     if (health <=0){this.alive = false;}
   }
-
+  @override
+  void incrementDefense() {
+    this.defense += 2;
+  }
 }
 
 String? getCharacterName(){
@@ -118,7 +127,7 @@ void main() {
   print('저기 히어로들이 당신을 쫓아오고 짜증나게 하는데 한번 혼쭐부터 내줄까요?');
 
   print('게임을 시작하시겠습니까? (y)');
-
+  int track_turns = 0;
   if (stdin.readLineSync() == 'y'){
     print('용사님, 당신의 이름은 무엇입니까?');
     Character user = loadCharacterStats();
@@ -132,7 +141,13 @@ void main() {
       int choiceAction = inputAction(user);
       try {
         Monster apponent = loadMonsterStats();
+        track_turns += 1;
+        if (track_turns>0 && track_turns%3 == 0){
+          print('3번째 턴 마다 상대방의 방어력이 2 오릅니다!');
+          apponent.incrementDefense();
+        }
         print('상대방의 체력은 ${apponent.health}, 공격력은 ${apponent.attack}, 방어력은 ${apponent.defense}인 ${apponent.name}입니다!');
+        
         switch (choiceAction){
           //힐
           case 0:
@@ -152,8 +167,28 @@ void main() {
             actions(user,apponent);
             user.defense -= user.attack;
             //choiceAction = inputAction(user);
+          
+          case 3: 
+            print('어떤 아이템을 사용하시겠습니까?');
+            print('아이템을 사용하는것은 턴을 소비 하지 않습니다!');
+            print('1: 공격력 +1, 2: 방어력+1');
+            try {
+              int itemNum = int.parse(stdin.readLineSync()!);
+              //item usage
+              switch (itemNum) {
+                case 1: 
+                  user.incrementAttack();
+                  print('당신의 공격력은 이제 ${user.attack}입니다.');
+                case 2:
+                  user.incrementDefense();
+                  print('당신의 방어력은 이제 ${user.defense}입니다');
+              }
+            } catch (e) {
+              print(e);
+            }
+
           //저장 및 종료
-          case 3:
+          case 4:
             print('현재 상황을 저장하고 종료하겠습니다.');
             //ToDo: save changes in CSV
             //shutDown();
@@ -195,7 +230,7 @@ void shutDown() {
 int inputAction(Character user) {
   print('your turn, ${user.name}');
   print('chose your action');
-  print('0: heal(+5 health), 1: attack, 2: guard(attack point added to defense), 3: save and close');
+  print('0: heal(+5 health), 1: attack, 2: guard(attack point added to defense), 3: use items, 4: save and close');
   int action = int.parse(stdin.readLineSync()!);
   print('$action을 입력하셨습니다.');
   return action;
@@ -210,3 +245,10 @@ void actions(Character user, Monster apponent){
 }
 
 //toDo: make function for reading monsters and pulling up one after another
+void saveCurrent(){
+  //saving player stats
+
+  //saving monster stats
+
+
+}
