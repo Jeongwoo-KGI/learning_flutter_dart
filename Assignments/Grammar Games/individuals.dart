@@ -15,7 +15,8 @@ class Character {
   }
 
   bool defenseAction(int attacked) {
-    this.health -= attacked - this.defense;
+    int damage = attacked - this.defense;
+    if (damage>=0) this.health -= damage;
     if (this.health <= 0){
       print('사망하셨습니다. 게임을 다시 도전해주세요');
       return this.alive = false;

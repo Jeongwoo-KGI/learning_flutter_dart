@@ -24,17 +24,22 @@ Character loadStats(String filename) {
     exit(1);  
   }
 }
-Monster loadMStats(String filename){
+List<Monster> loadMStats(String filename){
   try {
     final file = File(filename);
-    final contents = file.readAsStringSync();
-    final stats = contents.split(',');
-    if (stats.length != 3) throw FormatException('Invalid character data');    
-    String name  = stats[0];
-    int health = int.parse(stats[1]);
-    int attack = int.parse(stats[2]);    
-    Monster monster = Monster (name, health, attack);
-    return monster;
+    final contents = file.readAsLinesSync();
+    List<Monster> monster_list = [];
+    for(var content in contents){
+      
+      final stats = content.split(',');
+      if (stats.length != 3) throw FormatException('Invalid monster data');    
+      String name  = stats[0];
+      int health = int.parse(stats[1]);
+      int attack = int.parse(stats[2]);    
+      Monster monster = Monster (name, health, attack);
+      monster_list.add(monster);
+    }
+    return monster_list;
   } catch (e) {
     print('몬스터 데이터를 불러오는 데 실패했습니다: $e');
     exit(1);  
@@ -45,7 +50,7 @@ Character loadCharacterStats(){
   return loadStats('C:\\Users\\green\\SPARTA2024\\learning_flutter_dart\\Assignments\\Grammar Games\\characters.txt');
 }
 
-Monster loadMonsterStats(){
+List<Monster> loadMonsterStats(){
 //call 3 monsters
   //for(int i; i<3; i++){
     //
@@ -69,19 +74,22 @@ void main() {
     print('당신의 현재 스테이터스입니다. 체력 : ${user.health}, 공격력 : ${user.attack}, 방어력 : ${user.defense}');
     print('공격력 만큼 상대방의 체력을 깎을 수 있고 깎고, 공격을 받을때 방어력 만큼 체력이 덜 깎이는 시스템입니다.');
     print('이세게에 익숙하지 않은 당신, 튜토리얼로 겸 적응 겸 해서 저 히어로에게 선빵을 날릴 수 있게 해드릴게요 :) ');
-
+    List<Monster> apponents = loadMonsterStats();
+    Monster apponent = apponents[0];
+    int killCount = 0;
     bool close = false;  
-    while(close == false){
+    //start game
+    while(close == false && killCount < apponents.length){
       int choiceAction = inputAction(user);
       try {
-        Monster apponent = loadMonsterStats();
         track_turns += 1;
         if (track_turns>0 && track_turns%3 == 0){
           print('3번째 턴 마다 상대방의 방어력이 2 오릅니다!');
           apponent.incrementDefense();
         }
-        print('상대방의 체력은 ${apponent.health}, 공격력은 ${apponent.attack}, 방어력은 ${apponent.defense}인 ${apponent.name}입니다!');
-        
+        if(apponent.alive == true) {print('상대방의 체력은 ${apponent.health}, 공격력은 ${apponent.attack}, 방어력은 ${apponent.defense}인 ${apponent.name}입니다!');}
+        else{killCount ==1; apponent = apponents[killCount];} 
+
         switch (choiceAction){
           //힐
           case 0:
@@ -129,6 +137,7 @@ void main() {
             print('현재 상황을 저장하고 종료하겠습니다.');
             //ToDo: save changes in CSV
             //shutDown();
+            saveCurrent(user, apponent);
             close = true;
 
           default: 
@@ -149,6 +158,9 @@ void main() {
     if (close == true){
       shutDown();
       //break;
+    } else if(killCount ==apponents.length-1){
+      shutDown();
+      print('모든 몬스터를 처치하였습니다.');
     }
 
   } else {
@@ -182,10 +194,12 @@ void actions(Character user, Monster apponent){
 }
 
 //toDo: make function for reading monsters and pulling up one after another
-void saveCurrent(){
+void saveCurrent(Character user, Monster apponent){
   //saving player stats
-
+  final file = File('save_file.txt');
+  file.writeAsStringSync('Charcter: ${user.name}, ${user.health}, ${user.defense}, ${user.alive}');
   //saving monster stats
-
+  file.writeAsStringSync('Monster: ${apponent.name}, ${apponent.health}, ${apponent.attack}, ${apponent.defense}');
+  
 
 }
